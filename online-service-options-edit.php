@@ -19,8 +19,10 @@
 <th>Youtubeの待機画像</th>
 <td><?php $this->generate_upload_image_tag('online_service_wait_image_url', $options['online_service_wait_image_url']); ?></td>
 </tr>
+<tr>
+<th>バックナンバーURL</th>
+<td><input type="url" name="online_service_setting[online_service_backnumber_url]" value="<?php echo $options['online_service_backnumber_url']; ?>" size="70"></td></tr>
 </table>
-
 
 <h3>テンプレート（上級者向け）</h3>
 <table class="form-table">

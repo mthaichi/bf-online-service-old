@@ -13,7 +13,7 @@ Version: 0.3.2
  */
 class Online_Service {
 	
-	private $version = '0.3.2';
+	private $version = '0.4.0';
 	
 	private $os_data = array();
 	
@@ -43,7 +43,7 @@ class Online_Service {
 	'shuho2_html' => '<a href="$pdf"><img class="alignnone size-full" style="border: 1px solid #ddd;" src="%image_url%" alt="" width="100%"></a>',
 	'message_mp3_html' => '[audio mp3="%message_mp3%"][/audio]' . "\n\n" . '<a href="%message_mp3%">MP3ダウンロード</a>',
 	'entry_form_html' => '<div class="online-service-entry-box"><div class="title"><span class="online-service-entry-box-title"><span class="post-title">%title%</span> 出席報告</span></div>
-<div class="inner">オンライン礼拝に参加された方は氏名を入力して「出席しました」を押してください。
+<div class="inner"><p>オンライン礼拝に参加された方は氏名を入力して「出席しました」を押してください。</p>
 <form class="os-entry-form">%name_input% %submit_button%<br>%result_message%</form></div></div>'
 	 );
 	
@@ -122,6 +122,8 @@ class Online_Service {
 	 */
 	public function initialize() {
 		
+		$target_date = $_GET['date'] ? htmlspecialchars($_GET['date']) : date('Ymd', time());
+		
 		$args = array(
 			'posts_per_page' => 1,
 			'post_type' => array(
@@ -131,6 +133,15 @@ class Online_Service {
 			'orderby' => 'meta_value',
 			'order' => 'DESC'
 		);
+		
+		$args['meta_query'] = array(
+				'key' => 'service_date',
+				'value' => date('Y/m/d', strtotime($target_date)),
+				'compare' => '<=',
+				'type' => 'DATE'
+		);
+		
+		
 		
 		$os_posts = get_posts( $args );
 		if ( is_array( $os_posts ) && count( $os_posts ) > 0 ) {
@@ -464,6 +475,9 @@ class Online_Service {
 		return $html . $image2_html;
 	}
 	
+	
+
+	
 	/**
 	 * display_archive function.
 	 * 
@@ -541,6 +555,10 @@ class Online_Service {
 				$post_url = wp_get_attachment_url( $post->message_pdf );
 			} else if ($atts['type'] == 'mp3') {
 				$post_url = wp_get_attachment_url( $post->message_mp3 );
+			} else if ($atts['type'] == 'page') {
+				$post_url = $this->options['online_service_backnumber_url'] . "?date=" . $post_year . $post_month . $post_day;
+			} else if ($atts['type'] == 'youtube') {
+ 				$post_url  = $post->youtube_url;
  			} else  {
  				$post_url  = $post->youtube_url;
  			}
