@@ -13,7 +13,7 @@ Version: 0.3.2
  */
 class Online_Service {
 	
-	private $version = '0.4.0';
+	private $version = '0.4.1';
 	
 	private $os_data = array();
 	
@@ -122,7 +122,7 @@ class Online_Service {
 	 */
 	public function initialize() {
 		
-		$target_date = $_GET['date'] ? htmlspecialchars($_GET['date']) : date('Ymd', time());
+		$target_date = $_GET['date'] ? htmlspecialchars($_GET['date']) : '';
 		
 		$args = array(
 			'posts_per_page' => 1,
@@ -134,13 +134,15 @@ class Online_Service {
 			'order' => 'DESC'
 		);
 		
-		$args['meta_query'] = array(
-				'key' => 'service_date',
-				'value' => date('Y/m/d', strtotime($target_date)),
-				'compare' => '<=',
-				'type' => 'DATE'
-		);
 		
+		if ($target_date <> '') {
+			$args['meta_query'] = array(
+					'key' => 'service_date',
+					'value' => date('Y/m/d', strtotime($target_date)),
+					'compare' => '<=',
+					'type' => 'DATE'
+			);
+		}
 		
 		
 		$os_posts = get_posts( $args );
@@ -189,6 +191,10 @@ class Online_Service {
 			 $this,
 			'display_service_date' 
 		) );	
+		add_shortcode( 'OS_main_title', array(
+			 $this,
+			'display_main_title' 
+		) );		
 		add_shortcode( 'OS_title', array(
 			 $this,
 			'display_title' 
@@ -342,6 +348,17 @@ class Online_Service {
 		}
 		return $service_date;
 	}
+
+	/**
+	 * display_title function.
+	 * 
+	 * @access public
+	 * @param mixed $atts
+	 * @return void
+	 */
+	public function display_main_title( $atts ) {		
+		return $this->wp_data->post_title;
+	}	
 	
 	/**
 	 * display_title function.
@@ -638,7 +655,7 @@ class Online_Service {
 		$html        = $this->options['entry_form_html'];
 		
 		$name_input_html = '<input type="text" id="online_service_entry_name" value="" placeholder="氏名を入力ください">';
-		$submit_button_html = '<input type="button" value="出席しました" class="entry_submit">';
+		$submit_button_html = '<input type="submit" value="出席しました" class="entry_submit">';
 		$result_html = '<div class="online-service-entry-success"></div><div class="online-service-entry-error"></div>';
 		
 		if ( ! $this->wp_data->service_date ) {
