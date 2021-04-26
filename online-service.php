@@ -5,7 +5,7 @@ Plugin URI:
 Description: オンライン礼拝を管理するプラグインです。
 Author:BREADFISH
 Author URI:http://breadfish.jp
-Version: 0.3.2
+Version: 0.4.2
 */
 
 /**
@@ -13,7 +13,7 @@ Version: 0.3.2
  */
 class Online_Service {
 	
-	private $version = '0.4.1';
+	private $version = '0.4.2';
 	
 	private $os_data = array();
 	
@@ -28,6 +28,8 @@ class Online_Service {
 	private $option_name = 'online_service_setting';
 	
 	private $is_acf_installed = FALSE;
+	
+	private $is_archive_mode = FALSE;
 	
 	private $is_pdf_embedder_enabled = FALSE;
 	
@@ -122,8 +124,12 @@ class Online_Service {
 	 */
 	public function initialize() {
 		
-		$target_date = $_GET['date'] ? htmlspecialchars($_GET['date']) : '';
-		
+		$target_date = '';
+		if (array_key_exists('date', $_GET)) {
+			$this->is_archive_mode = TRUE;
+			$target_date = $_GET['date'];
+		}
+				
 		$args = array(
 			'posts_per_page' => 1,
 			'post_type' => array(
@@ -425,7 +431,7 @@ class Online_Service {
 		
 		$url = $this->wp_data->youtube_url;
 		
-		if ( $url != "" ) {
+		if ( $url != "" || $this->is_archive_mode ) {
 			
 			$embed_url = $this->get_embed_youtube_url( $url );
 			
